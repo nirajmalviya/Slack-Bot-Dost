@@ -3,3 +3,4 @@ uvicorn
 slack_bolt
 python-dotenv
 agno
+groq
