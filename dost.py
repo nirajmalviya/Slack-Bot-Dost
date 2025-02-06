@@ -1,6 +1,6 @@
-from flask import Flask, request
+from fastapi import FastAPI, Request
 from slack_bolt import App
-from slack_bolt.adapter.flask import SlackRequestHandler
+from slack_bolt.adapter.fastapi import SlackRequestHandler
 import os
 from dotenv import load_dotenv
 from agno.agent import Agent
@@ -13,8 +13,8 @@ SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
 SLACK_SIGNING_SECRET = os.getenv("SLACK_SIGNING_SECRET")
 groq_api_key = os.getenv("GROQ_API_KEY")
 
-# Flask app
-flask_app = Flask(__name__)
+# FastAPI app
+app = FastAPI()
 
 # Slack app using Events API
 slack_app = App(token=SLACK_BOT_TOKEN, signing_secret=SLACK_SIGNING_SECRET)
@@ -32,9 +32,9 @@ def format_for_slack(text):
     text = re.sub(r'\*\*(.*?)\*\*', r'_\1_', text)  # Convert **text** to _text_ (italic in Slack)
     return text
 
-@flask_app.route("/slack/events", methods=["POST"])
-def slack_events():
-    return handler.handle(request)
+@app.post("/slack/events")
+async def slack_events(request: Request):
+    return await handler.handle(request)
 
 @slack_app.event("app_mention")  # Bot gets triggered when mentioned
 def handle_mention(event, say):
@@ -76,13 +76,12 @@ def handle_mention(event, say):
             - Never explain jokes—if they don’t get it, that’s their problem.
             - If they try to argue back, double down and roast them even harder.
 
-            talk.
             - Always stay one step ahead, using previous stupidity against them whenever possible.
             - If they ask a follow-up question, use it as ammo to make them look even dumber.
             - If they attempt to be smart, mock their overconfidence and bring them back to reality.
             - ONLY generate text responses unless explicitly ordered to do otherwise.
         """,
-    show_tool_calls=False,
+        show_tool_calls=False,
         markdown=True
     )
 
@@ -94,5 +93,4 @@ def handle_mention(event, say):
         user_memory[channel_id][user_id] = history
         say(bot_reply)
 
-if __name__ == "__main__":
-    flask_app.run(port=3000, debug=True)
+# Run with: uvicorn filename:app --host 0.0.0.0 --port 3000 --reload
