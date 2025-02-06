@@ -1,6 +1,6 @@
-fastapi==0.95.0
-slack-bolt==1.16.0
-python-dotenv==1.0.0
-agno==1.0.0
-uvicorn==0.22.0
+fastapi
+slack-bolt
+python-dotenv
+agno
+uvicorn
 Cython
