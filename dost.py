@@ -24,7 +24,7 @@ handler = SlackRequestHandler(slack_app)
 user_memory = {}
 
 # Initialize AI model
-model = Groq('mixtral-8x7b-32768', api_key=groq_api_key, temperature=0.6)
+model = Groq('llama-3.3-70b-versatile', api_key=groq_api_key, temperature=0.6)
 
 # Function to format text for Slack
 def format_for_slack(text):
