@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: fastapi-slackbot
+    env: python
+    repo: https://github.com/nirajmalviya/Slack-Bot-Dost.git
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start.sh
+    envVars:
+      - key: SLACK_BOT_TOKEN
+        sync: false
+      - key: SLACK_SIGNING_SECRET
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
