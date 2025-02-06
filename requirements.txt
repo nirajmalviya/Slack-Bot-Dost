@@ -1,6 +1,6 @@
 fastapi
-slack-bolt
+uvicorn
+slack_bolt
 python-dotenv
 agno
-uvicorn
-Cython
+re
