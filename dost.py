@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from agno.agent import Agent
 from agno.models.groq import Groq
 import re
+from duckduckgo_search import DDGS  # Import DuckDuckGo search
 
 # Load environment variables
 load_dotenv()
@@ -32,6 +33,14 @@ def format_for_slack(text):
     text = re.sub(r'\*\*(.*?)\*\*', r'_\1_', text)  # Convert **text** to _text_ (italic in Slack)
     return text
 
+# DuckDuckGo search function
+def duckduckgo_search(query):
+    with DDGS() as ddgs:
+        results = ddgs.text(query, max_results=3)  # Fetch top 3 results
+        if results:
+            return "\n".join([f"- *{r['title']}*\n  {r['href']}" for r in results])
+        return "No relevant results found."
+
 @app.post("/slack/events")
 async def slack_events(request: Request):
     return await handler.handle(request)
@@ -47,6 +56,16 @@ def handle_mention(event, say):
 
     history.append(f"User: {user_message}")
     history = history[-10:]  # Keep only last 10 messages
+
+    # Check if user wants a real-time search
+    if user_message.lower().startswith("search:"):
+        query = user_message.replace("search:", "").strip()
+        if query:
+            search_results = duckduckgo_search(query)
+            say(f"*🔎 DuckDuckGo Search Results for:* `{query}`\n\n{search_results}")
+        else:
+            say("Please provide a valid search query after `search:`")
+        return
 
     context = (
         "### Conversation History ###\n"
